@@ -1,104 +1,120 @@
  class CFG {
-            constructor() {
-                this.productions = {};
-                this.startSymbol = null;
-            }
+   constructor() {
+     this.productions = {};
+     this.startSymbol = null;
+   }
 
-            addProduction(nonterminal, production) {
-                if (!this.startSymbol) {
-                    this.startSymbol = nonterminal;
-                }
-                if (!this.productions[nonterminal]) {
-                    this.productions[nonterminal] = [];
-                }
-                const parts = production.split("|");
-                for (let part of parts) {
-                    let trimmed = part.trim();
-                    if (trimmed.toLowerCase() === "ε" || trimmed.toLowerCase() === "espsilon") {
-                        trimmed = "ɛ";
-                    }
-                    this.productions[nonterminal].push(trimmed ? trimmed : "ɛ");
-                }
-            }
+   addProduction(nonterminal, production) {
+     if (!this.startSymbol) {
+       this.startSymbol = nonterminal;
+     }
+     if (!this.productions[nonterminal]) {
+       this.productions[nonterminal] = [];
+     }
+     const parts = production.split('|');
+     for (let part of parts) {
+       let trimmed = part.trim();
+       if (
+         trimmed.toLowerCase() === 'ε' ||
+         trimmed.toLowerCase() === 'espsilon'
+       ) {
+         trimmed = 'ɛ';
+       }
+       this.productions[nonterminal].push(trimmed ? trimmed : 'ɛ');
+     }
+   }
 
-            resetGrammar() {
-                this.productions = {};
-                this.startSymbol = null;
-            }
+   resetGrammar() {
+     this.productions = {};
+     this.startSymbol = null;
+   }
 
-            displayGrammar() {
-                let grammarLines = [];
-                if (this.startSymbol) {
-                    grammarLines.push(`Start Symbol: ${this.startSymbol}`);
-                }
-                for (const nt in this.productions) {
-                    let prods = this.productions[nt].map((p) => (p === "" ? "ɛ" : p));
-                    grammarLines.push(`${nt} → ${prods.join(" | ")}`);
-                }
-                return grammarLines.join("\n");
-            }
+   displayGrammar() {
+     let grammarLines = [];
+     if (this.startSymbol) {
+       grammarLines.push(`Start Symbol: ${this.startSymbol}`);
+     }
+     for (const nt in this.productions) {
+       let prods = this.productions[nt].map(p => (p === '' ? 'ɛ' : p));
+       grammarLines.push(`${nt} → ${prods.join(' | ')}`);
+     }
+     return grammarLines.join('\n');
+   }
 
-            testString(string) {
-                if (!this.startSymbol) {
-                    return { result: false, derivation: [], message: "No CFG loaded." };
-                }
-                return this.isDerived(string);
-            }
+   testString(string) {
+     if (!this.startSymbol) {
+       return { result: false, derivation: [], message: 'No CFG loaded.' };
+     }
+     return this.isDerived(string);
+   }
 
-            isDerived(targetString) {
-                let queue = [];
-                queue.push({ current: this.startSymbol, derivation: [] });
-                let visited = new Set();
+   isDerived(targetString) {
+     let queue = [];
+     queue.push({ current: this.startSymbol, derivation: [] });
+     let visited = new Set();
 
-                while (queue.length > 0) {
-                    let { current, derivation } = queue.shift();
+     while (queue.length > 0) {
+       let { current, derivation } = queue.shift();
 
-                    if (visited.has(current)) continue;
-                    visited.add(current);
+       if (visited.has(current)) continue;
+       visited.add(current);
 
-                    if (current === targetString) {
-                        return { result: true, derivation: derivation };
-                    }
+       // Check if the current string matches the target string
+       if (current === targetString) {
+         return { result: true, derivation: derivation };
+       }
 
-                    if (targetString === "") {
-                        if (current.length > 10) continue;
-                    } else {
-                        if (current.length > targetString.length * 3) continue;
-                    }
+       // Handle empty string case
+       if (targetString === '' && current === 'ɛ') {
+         return { result: true, derivation: derivation };
+       }
 
-                    let leftmostPos = -1;
-                    for (let i = 0; i < current.length; i++) {
-                        if (this.productions.hasOwnProperty(current[i])) {
-                            leftmostPos = i;
-                            break;
-                        }
-                    }
-                    if (leftmostPos === -1) continue;
+       // Prune the search space if the current string is too long
+       if (targetString === '') {
+         if (current.length > 10) continue;
+       } else {
+         if (current.length > targetString.length * 3) continue;
+       }
 
-                    let nonterminal = current[leftmostPos];
-                    let productions = this.productions[nonterminal] || [];
+       // Find the leftmost non-terminal
+       let leftmostPos = -1;
+       for (let i = 0; i < current.length; i++) {
+         if (this.productions.hasOwnProperty(current[i])) {
+           leftmostPos = i;
+           break;
+         }
+       }
+       if (leftmostPos === -1) continue;
 
-                    for (let prod of productions) {
-                        let newStr = "";
-                        if (prod === "ɛ") {
-                            newStr = current.slice(0, leftmostPos) + current.slice(leftmostPos + 1);
-                        } else {
-                            newStr = current.slice(0, leftmostPos) + prod + current.slice(leftmostPos + 1);
-                        }
+       // Apply productions to the leftmost non-terminal
+       let nonterminal = current[leftmostPos];
+       let productions = this.productions[nonterminal] || [];
 
-                        let newDerivation = derivation.concat([
-                            {
-                                Rule: `${nonterminal} → ${prod}`,
-                                Application: current,
-                                Result: newStr,
-                            },
-                        ]);
-                        queue.push({ current: newStr, derivation: newDerivation });
-                    }
-                }
-                return { result: false, derivation: [] };
-            }
-        }
+       for (let prod of productions) {
+         let newStr = '';
+         if (prod === 'ɛ') {
+           newStr =
+             current.slice(0, leftmostPos) + current.slice(leftmostPos + 1);
+         } else {
+           newStr =
+             current.slice(0, leftmostPos) +
+             prod +
+             current.slice(leftmostPos + 1);
+         }
+
+         let newDerivation = derivation.concat([
+           {
+             Rule: `${nonterminal} → ${prod}`,
+             Application: current,
+             Result: newStr,
+           },
+         ]);
+         queue.push({ current: newStr, derivation: newDerivation });
+       }
+     }
+     return { result: false, derivation: [] };
+   }
+ }
 
         let cfgObj = new CFG();
         let testResults = [];
