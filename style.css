@@ -1,0 +1,10 @@
+.glassmorphism {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.gradient-bg {
+ background: rgb(106,91,194);
+background: linear-gradient(125deg, rgba(106,91,194,0.979411833092612) 20%, rgba(204,204,204,1) 56%, rgba(246,243,137,1) 85%); }
