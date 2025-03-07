@@ -5,12 +5,11 @@ A powerful and interactive simulator for **Context-Free Grammars (CFGs)**, allow
 ---
 
 ## 🚀 Features
-
-✅ **Grammar Definition** – Define custom CFGs with production rules.  
-✅ **String Validation** – Check if a string belongs to the language.  
-✅ **Step-by-Step Derivations** – Interactive breakdown of how a string is derived.  
-✅ **Interactive UI** – Simple and easy-to-use web interface  
-✅ **Client-Side Execution** – Runs entirely in the browser, no backend required  
+- **Grammar Definition** – Define custom CFGs with production rules.  
+- **String Validation** – Check if a string belongs to the language.  
+- **Step-by-Step Derivations** – Interactive breakdown of how a string is derived.  
+- **Interactive UI** – Simple and easy-to-use web interface  
+- **Client-Side Execution** – Runs entirely in the browser, no backend required  
 ---
 
 ## 🖥️ Installation
